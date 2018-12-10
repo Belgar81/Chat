@@ -1,4 +1,5 @@
 import re
+import time
 
 re_usermask = ("^\S+\!\S+\@\S+")
 
@@ -11,6 +12,7 @@ class IRC_Message():
         self.command = {'type':"long", 'value':None}
         #types: short, long
         self.params = {'middle':[], 'trailing':None}
+        self.timestamp = time.time()
 
         self.prefix["value"], self.command["value"], data = data[1:].split(maxsplit=2)
         if (self.prefix["value"] == servername): self.prefix["type"] = "server"
@@ -33,4 +35,4 @@ class IRC_Message():
             self.params["trailing"] = ''.join(data[1:])
 
     def __str__(self):
-        return "=> " + str(self.prefix["type"]) + ": " + str(self.prefix["value"]) + " => " + str(self.command["type"]) + ": " + str(self.command["value"]) + " => " + str(self.params)
+        return "=> " + str(self.timestamp) + " => " + str(self.prefix["type"]) + ": " + str(self.prefix["value"]) + " => " + str(self.command["type"]) + ": " + str(self.command["value"]) + " => " + str(self.params)

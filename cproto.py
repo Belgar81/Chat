@@ -1,6 +1,7 @@
 import asyncio
 from message import IRC_Message
 from channel import IRC_Channel
+from user import IRC_User
 
 class IRC_Client_Protocol(asyncio.BufferedProtocol):
 
@@ -12,9 +13,9 @@ class IRC_Client_Protocol(asyncio.BufferedProtocol):
         self.lastmessage = None
         self.isConnected = False
 
-        self.server = { 'name': None, 'messages':[],
-                        'channel':IRC_Channel("#barcelona_liberal"),
-                        'users': {}}
+        self.server = { 'name': None, 'messages':[]}
+        self.channel = IRC_Channel("#barcelona_liberal")
+        self.users = {'SynoBot':IRC_User("SynoBot!SynoBot@DdAbcZ.BUtNt6.virtual")}
 
     def connection_made(self, transport):
         self.transport = transport
@@ -66,24 +67,42 @@ class IRC_Client_Protocol(asyncio.BufferedProtocol):
         if (message.command["value"] == "MODE"):
             self.write("JOIN #barcelona_liberal\r\n")
             self.write("MODE SynoBot +c\r\n")
-"""
-=> Belgar!IdentD@The.Winner.Takes.ItAll PRIVMSG {'middle': ['#barcelona_liberal'], 'trailing': ':('}
-=> Belgar!IdentD@The.Winner.Takes.ItAll PART {'middle': ['#barcelona_liberal'], 'trailing': None}
-=> Belgar!IdentD@The.Winner.Takes.ItAll JOIN {'middle': [], 'trailing': '#barcelona_liberal'}
-=> CHaN!-@- MODE {'middle': ['#barcelona_liberal', '+o', 'Belgar '], 'trailing': None}
+
+            """
+            => Belgar!IdentD@The.Winner.Takes.ItAll PRIVMSG {'middle': ['#barcelona_liberal'], 'trailing': ':('}
+            => Belgar!IdentD@The.Winner.Takes.ItAll PART {'middle': ['#barcelona_liberal'], 'trailing': None}
+            => Belgar!IdentD@The.Winner.Takes.ItAll JOIN {'middle': [], 'trailing': '#barcelona_liberal'}
+            => CHaN!-@- MODE {'middle': ['#barcelona_liberal', '+o', 'Belgar '], 'trailing': None}
+
+            self.prefix = {'type':None, 'value':None}
+            #types: server, user, misc
+            self.command = {'type':"long", 'value':None}
+            #types: short, long
+            self.params = {'middle':[], 'trailing':None}
+
+            self.server = { 'name': None, 'messages':[],
+                            'channel':IRC_Channel("#barcelona_liberal"),
+                            'users': {'count':0, 'members':{}}}
+            """
+
+        if (message.prefix["type"] != "user"): return
+
+        if (message.command["type"] != "long"): return
+
+        if (message.command["value"] == "JOIN"):
+
+            key = message.prefix["value"].split("!")[0]
+            if key in self.users.keys():
+                user = self.users[key]
+                user.inside = True
+            else:
+                user = IRC_User(message["prefix"])
+                user.inside = True
+                self.users["user.nick"] = user
+                self.users["user.nick"]
+                print (user)
 
 
-        if not message.prefix["isServer"]):
-
-        if len(self.users) == 0:
-            user = IRC_User(message["prefix"])
-            self.users["user.nick"] = user
-        else:
-            for key in self.users.keys():
-                if message["prefix"].split("!")[0] == key:
-                    user = self.users[key]
-                    print (">>> " + message)
 
 
         #    self.server["messages"].append(message)
-"""
