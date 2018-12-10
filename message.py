@@ -34,6 +34,7 @@ class IRC_Message():
         if (len(data) > 1):
             self.params["trailing"] = ''.join(data[1:])
 
+
     def __format__(self, format):
         if (format == 'long'):
             return '{:10.2f} => {}: {} => {}: {} => {}'.format(self.timestamp, self.prefix["type"],

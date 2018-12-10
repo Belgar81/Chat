@@ -4,16 +4,25 @@ class IRC_User():
 
     def __init__(self, data: str):
         self.id = IRC_User.count
-        self.nick, data = data.split("!")
-        self.ident, self.ipv = data.split("@")
-        self.modes = None
-        self.inside = False
-        self.messages = []
-
         IRC_User.count += 1
 
-    def reload(self, data: str):
-        self.ident, self.ipv = data.split("!")[1].split("@")
+        self.identity = {'nick':None, 'ident':None, 'register':None, 'online':True, 'ipv':None, 'olds_ipvs': []}
+        self.alias = {'identidad': []}
+
+        self.identity["nick"], data = data.split("!")
+        self.identity["ident"], self.identity["ipv"] = data.split("@")
+
+        self.messages = []
+
+        print (self.identity)
+
+        ## Seguimiento de cambios de nick... registrados no registrados... alias, clones, ...
+
+    def join(self, data: str):
+        self.identity["online"] = True
+
+    def quit(self):
+        self.identity["online"] = False
 
     def get_count(self):
         return (IRC_User.count)
@@ -22,13 +31,16 @@ class IRC_User():
         if (format == 'id'):
             return '{}'.format(self.id)
         if (format == 'nick'):
-            return '{}'.format(self.nick)
+            return '{}'.format(self.identity["nick"])
         if (format == 'mask'):
-            return '{}!{}@{}'.format(self.nick, self.ident, self.ipv)
+            return '{}!{}@{}'.format(self.identity["nick"], self.identity["ident"], self.identity["ipv"])
         if (format == 'messages'):
             return '{}'.format(len(self.messages))
         if (format == 'long'):
-            if self.inside: online = "Conectado"
+            if self.identity["online"]: online = "Conectado"
             else: online = "Desconectado"
-            return '{} esta {} y tiene {} Mensages'.format(self.nick, online, len(self.messages))
+            if (self.identity["register"] == True): register = "Registrado"
+            elif (self.identity["register"] == False): register = "No Registrado"
+            else: register = "Sin estado de Registro..."
+            return '{} esta {}, {} y ha puesto {} Mensages'.format(self.identity["nick"], online, register, len(self.messages))
         return 'IRC_User'

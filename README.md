@@ -1,2 +1,2 @@
 # Chat
-asyncio Python3.7 IRC Client and Server Buffered Protocol
+asyncio Python3.7 IRC Bot Client and Server with extended Functions no RFC Buffered Protocol.

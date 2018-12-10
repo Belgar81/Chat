@@ -15,7 +15,8 @@ class IRC_Client_Protocol(asyncio.BufferedProtocol):
 
         self.server = { 'name': None, 'messages':[]}
         self.channel = IRC_Channel(channel)
-        self.users = {'SynoBot':IRC_User("SynoBot!SynoBot@DdAbcZ.BUtNt6.virtual")}
+
+        #actions
 
     def connection_made(self, transport):
         self.transport = transport
@@ -60,61 +61,15 @@ class IRC_Client_Protocol(asyncio.BufferedProtocol):
         print ('Conexion Cerrada.')
         self.on_lost.set_result(True)
 
+
     def dispatcher(self, message: IRC_Message):
 
         print ('{:long}'.format(message))
 
-        if (message.command["value"] == "MODE"):
+        if (message.command["value"] == "376"):
             self.write('JOIN {:name} \r\n'.format(self.channel))
             self.write('MODE SynoBot +c\r\n')
 
+        action = self.channel.dispatcher(message)
 
-        if (message.prefix["type"] != "user"): return
-
-        if (message.command["type"] != "long"): return
-
-        if (message.command["value"] == "PRIVMSG"):
-
-            nick = message.prefix["value"].split('!')[0]
-            if nick in self.users.keys():
-
-                user = self.users[nick]
-                user.messages.append(message)
-
-                print ('PRIVMSG: {:long}'.format(user))
-
-                if (message.params["trailing"] == ".usuarios"):
-
-                    self.write('PRIVMSG {:name} : Hay {} usuarios en la BBDD\r\n'.format(self.channel, user.get_count()))
-                """
-                    out = 'PRIVMSG {:long} :'.format(self.channel)
-                    for user in self.users.values():
-                        out += '{:long}; '.format(user)
-                    out += "\r\n"
-                    self.write(out)
-                """
-
-                if (message.params["trailing"] == ".mensajes"):
-                    self.write('PRIVMSG {:name} : Has generado {:messages} Mensajes\r\n'.format(self.channel, user))
-
-
-        if (message.command["value"] == "JOIN"):
-
-            nick = message.prefix["value"].split("!")[0]
-            if nick in self.users.keys():
-                user = self.users[nick]
-                user.reload(message.prefix["value"])
-                user.inside = True
-            else:
-                user = IRC_User(message.prefix["value"])
-                user.inside = True
-                self.users[user.nick] = user
-            print ('JOIN: {:long}'.format(user))
-
-        for cmd in ["PART", "QUIT"]:
-            if (message.command["value"] == cmd):
-                nick = message.prefix["value"].split("!")[0]
-                if nick in self.users.keys():
-                    user = self.users[nick]
-                    user.inside = False
-                    print ('{}: {:long}'.format(cmd, user))
+        if action: self.write(action)
