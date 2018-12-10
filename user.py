@@ -12,5 +12,7 @@ class IRC_User():
 
         IRC_User.count += 1
 
-    def __str__(self):
-        return self.nick
+    def __format__(self, format):
+        if (format == 'long'):
+            return '{}) {} tiene {} Mensages'.format(self.id, self.nick, len(self.messages))
+        return 'IRC_User'

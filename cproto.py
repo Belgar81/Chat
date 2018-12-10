@@ -5,7 +5,7 @@ from user import IRC_User
 
 class IRC_Client_Protocol(asyncio.BufferedProtocol):
 
-    def __init__(self, on_lost, loop):
+    def __init__(self, on_lost, loop, channel):
         self.loop = loop
         self.buffer: bytearray = None
         self.transport = None
@@ -14,7 +14,7 @@ class IRC_Client_Protocol(asyncio.BufferedProtocol):
         self.isConnected = False
 
         self.server = { 'name': None, 'messages':[]}
-        self.channel = IRC_Channel("#barcelona_liberal")
+        self.channel = IRC_Channel(channel)
         self.users = {'SynoBot':IRC_User("SynoBot!SynoBot@DdAbcZ.BUtNt6.virtual")}
 
     def connection_made(self, transport):
@@ -42,7 +42,7 @@ class IRC_Client_Protocol(asyncio.BufferedProtocol):
                     self.server["name"] = line.split()[0][1:]
                 if (line[:4] == 'PING'):
                     self.isConnected = True
-                    self.write('PONG' + line[4:])
+                    self.write('PONG{}'.format(line[4:]))
             else:
                 if (line[-1:] != '\n'): self.lastmessage = line
                 else:
@@ -50,44 +50,37 @@ class IRC_Client_Protocol(asyncio.BufferedProtocol):
                         line = self.lastmessage + line
                         self.lastmessage = None
                     if (line[:4] == 'PING'):
-                        self.write('PONG' + line[4:])
+                        self.write('PONG{}'.format(line[4:]))
                     else:
                         message = IRC_Message(line.splitlines()[0], self.server["name"])
                         self.dispatcher(message)
         return None
 
     def eof_received(self) -> None:
-        print('The server closed the connection')
+        print ('Conexion Cerrada.')
         self.on_lost.set_result(True)
 
     def dispatcher(self, message: IRC_Message):
 
-        print (message)
+        print ('{:long}'.format(message))
 
         if (message.command["value"] == "MODE"):
-            self.write("JOIN #barcelona_liberal\r\n")
-            self.write("MODE SynoBot +c\r\n")
+            self.write('JOIN {:long} \r\n'.format(self.channel))
+            self.write('MODE SynoBot +c\r\n')
 
-            """
-            => Belgar!IdentD@The.Winner.Takes.ItAll PRIVMSG {'middle': ['#barcelona_liberal'], 'trailing': ':('}
-            => Belgar!IdentD@The.Winner.Takes.ItAll PART {'middle': ['#barcelona_liberal'], 'trailing': None}
-            => Belgar!IdentD@The.Winner.Takes.ItAll JOIN {'middle': [], 'trailing': '#barcelona_liberal'}
-            => CHaN!-@- MODE {'middle': ['#barcelona_liberal', '+o', 'Belgar '], 'trailing': None}
-
-            self.prefix = {'type':None, 'value':None}
-            #types: server, user, misc
-            self.command = {'type':"long", 'value':None}
-            #types: short, long
-            self.params = {'middle':[], 'trailing':None}
-
-            self.server = { 'name': None, 'messages':[],
-                            'channel':IRC_Channel("#barcelona_liberal"),
-                            'users': {'count':0, 'members':{}}}
-            """
 
         if (message.prefix["type"] != "user"): return
 
         if (message.command["type"] != "long"): return
+
+        if (message.command["value"] == "PRIVMSG"):
+            if (message.params["trailing"] == ".users"):
+                out = 'PRIVMSG {:long} :'.format(self.channel)
+                for user in self.users.values():
+                    out += '{:long} ; '.format(user)
+                out += "\r\n"
+                self.write(out)
+
 
         if (message.command["value"] == "JOIN"):
 
@@ -96,13 +89,7 @@ class IRC_Client_Protocol(asyncio.BufferedProtocol):
                 user = self.users[key]
                 user.inside = True
             else:
-                user = IRC_User(message["prefix"])
+                user = IRC_User(message.prefix["value"])
                 user.inside = True
-                self.users["user.nick"] = user
-                self.users["user.nick"]
+                self.users[user.nick] = user
                 print (user)
-
-
-
-
-        #    self.server["messages"].append(message)

@@ -34,5 +34,8 @@ class IRC_Message():
         if (len(data) > 1):
             self.params["trailing"] = ''.join(data[1:])
 
-    def __str__(self):
-        return "=> " + str(self.timestamp) + " => " + str(self.prefix["type"]) + ": " + str(self.prefix["value"]) + " => " + str(self.command["type"]) + ": " + str(self.command["value"]) + " => " + str(self.params)
+    def __format__(self, format):
+        if (format == 'long'):
+            return '{} => {}: {} => {}: {} => {}'.format(self.timestamp, self.prefix["type"],
+                    self.prefix["value"], self.command["type"], self.command["value"], self.params)
+        return 'IRC_Message'
