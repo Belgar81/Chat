@@ -1,6 +1,7 @@
 class IRC_Message():
 
     def __init__(self, data: str, servername: str):
+        
         self.prefix = {'isServer':True, 'value':None}
         self.command = {'isServer':True, 'value':None}
         self.params = {'middle':[], 'trailing':None}
@@ -17,7 +18,11 @@ class IRC_Message():
                 self.params["middle"].append(m)
                 data[0].lstrip()
             except ValueError:
-                self.params["middle"].append(data[0])
-                break
+                self.params["middle"].append(data)
+                data = [":"]
 
-        self.params["trailing"] = ''.join(data[1:])
+        if (len(data) > 1):
+            self.params["trailing"] = ''.join(data[1:])
+
+    def __str__(self):
+        return "=> " + str(self.prefix["value"]) + " " + str(self.command["value"]) + " " + str(self.params)

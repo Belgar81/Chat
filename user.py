@@ -6,3 +6,5 @@ class IRC_User():
         self.ipv = None
         self.modes = None
         self.online = False
+
+        self.messages = []
