@@ -12,7 +12,9 @@ class IRC_Client_Protocol(asyncio.BufferedProtocol):
         self.lastmessage = None
         self.isConnected = False
 
-        self.server = {'name': None, 'messages':[], 'channels':[IRC_Channel("#barcelona_liberal")]}
+        self.server = { 'name': None, 'messages':[],
+                        'channel':IRC_Channel("#barcelona_liberal"),
+                        'users': {}}
 
     def connection_made(self, transport):
         self.transport = transport
@@ -63,8 +65,25 @@ class IRC_Client_Protocol(asyncio.BufferedProtocol):
 
         if (message.command["value"] == "MODE"):
             self.write("JOIN #barcelona_liberal\r\n")
+            self.write("MODE SynoBot +c\r\n")
+"""
+=> Belgar!IdentD@The.Winner.Takes.ItAll PRIVMSG {'middle': ['#barcelona_liberal'], 'trailing': ':('}
+=> Belgar!IdentD@The.Winner.Takes.ItAll PART {'middle': ['#barcelona_liberal'], 'trailing': None}
+=> Belgar!IdentD@The.Winner.Takes.ItAll JOIN {'middle': [], 'trailing': '#barcelona_liberal'}
+=> CHaN!-@- MODE {'middle': ['#barcelona_liberal', '+o', 'Belgar '], 'trailing': None}
 
-#:barnamen_!android@BJVCHj.BrTPIQ.virtual JOIN :#barcelona_liberal
 
-        #if message.prefix["isServer"]:
+        if not message.prefix["isServer"]):
+
+        if len(self.users) == 0:
+            user = IRC_User(message["prefix"])
+            self.users["user.nick"] = user
+        else:
+            for key in self.users.keys():
+                if message["prefix"].split("!")[0] == key:
+                    user = self.users[key]
+                    print (">>> " + message)
+
+
         #    self.server["messages"].append(message)
+"""

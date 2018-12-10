@@ -1,15 +1,23 @@
+import re
+
+re_usermask = ("^\S+\!\S+\@\S+")
+
 class IRC_Message():
 
     def __init__(self, data: str, servername: str):
-        
-        self.prefix = {'isServer':True, 'value':None}
-        self.command = {'isServer':True, 'value':None}
+
+        self.prefix = {'type':None, 'value':None}
+        #types: server, user, misc
+        self.command = {'type':"long", 'value':None}
+        #types: short, long
         self.params = {'middle':[], 'trailing':None}
 
         self.prefix["value"], self.command["value"], data = data[1:].split(maxsplit=2)
-        if (self.prefix["value"] != servername): self.prefix["isServer"] = False
+        if (self.prefix["value"] == servername): self.prefix["type"] = "server"
+        elif re.match(re_usermask, self.prefix["value"]): self.prefix["type"] = "user"
+        else: self.prefix["type"] = "misc"
         self.command["value"].lstrip()
-        if not self.command["value"].isdigit(): self.command["isServer"] = False
+        if self.command["value"].isdigit(): self.command["type"] = "short"
         data.lstrip()
 
         while (data[0] != ":"):
@@ -25,4 +33,4 @@ class IRC_Message():
             self.params["trailing"] = ''.join(data[1:])
 
     def __str__(self):
-        return "=> " + str(self.prefix["value"]) + " " + str(self.command["value"]) + " " + str(self.params)
+        return "=> " + str(self.prefix["type"]) + ": " + str(self.prefix["value"]) + " => " + str(self.command["type"]) + ": " + str(self.command["value"]) + " => " + str(self.params)
