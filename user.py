@@ -13,10 +13,12 @@ class IRC_User():
         IRC_User.count += 1
 
     def __format__(self, format):
-        if (format == 'long'):
-            return '{}) {} tiene {} Mensages'.format(self.id, self.nick, len(self.messages))
-        if (format == 'mask'):
-            return '{}!{}@{}'.format(self.nick, self.ident, self.ipv)
         if (format == 'nick'):
             return '{}'.format(self.nick)
+        if (format == 'mask'):
+            return '{}!{}@{}'.format(self.nick, self.ident, self.ipv)
+        if (format == 'long'):
+            if self.inside: online = "Conectado"
+            else: online = "Desconectado"
+            return '{} esta {} y tiene {} Mensages'.format(self.nick, online, len(self.messages))
         return 'IRC_User'

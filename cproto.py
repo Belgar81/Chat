@@ -82,7 +82,7 @@ class IRC_Client_Protocol(asyncio.BufferedProtocol):
                 if (message.params["trailing"] == ".users"):
                     out = 'PRIVMSG {:long} :'.format(self.channel)
                     for user in self.users.values():
-                        out += '{:long} ; '.format(user)
+                        out += '{:long}; '.format(user)
                     out += "\r\n"
                     self.write(out)
 
@@ -101,4 +101,3 @@ class IRC_Client_Protocol(asyncio.BufferedProtocol):
                 nick = message.prefix["value"].split("!")[0]
                 if nick in self.users.keys():
                     self.users[nick].inside = False
-                    user.inside = True
