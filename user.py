@@ -15,4 +15,8 @@ class IRC_User():
     def __format__(self, format):
         if (format == 'long'):
             return '{}) {} tiene {} Mensages'.format(self.id, self.nick, len(self.messages))
+        if (format == 'mask'):
+            return '{}!{}@{}'.format(self.nick, self.ident, self.ipv)
+        if (format == 'nick'):
+            return '{}'.format(self.nick)
         return 'IRC_User'
