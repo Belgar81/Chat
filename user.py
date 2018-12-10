@@ -6,7 +6,7 @@ class IRC_User():
         self.id = IRC_User.count
         IRC_User.count += 1
 
-        self.identity = {'nick':None, 'ident':None, 'register':None, 'online':True, 'ipv':None, 'olds_ipvs': []}
+        self.identity = {'nick':None, 'ident':None, 'register':False, 'online':True, 'ipv':None, 'olds_ipvs': []}
         self.alias = {'identidad': []}
 
         self.identity["nick"], data = data.split("!")
@@ -39,8 +39,7 @@ class IRC_User():
         if (format == 'long'):
             if self.identity["online"]: online = "Conectado"
             else: online = "Desconectado"
-            if (self.identity["register"] == True): register = "Registrado"
-            elif (self.identity["register"] == False): register = "No Registrado"
-            else: register = "Sin estado de Registro..."
+            if self.identity["register"]: register = "Registrado"
+            else: register = "No Registrado"
             return '{} esta {}, {} y ha puesto {} Mensages'.format(self.identity["nick"], online, register, len(self.messages))
         return 'IRC_User'

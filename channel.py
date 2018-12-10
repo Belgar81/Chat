@@ -17,7 +17,8 @@ class IRC_Channel():
             if nick in self.users.keys(): user = self.users[nick]
             else: return None
 
-            if 'r' in message.params["trailing"].split()[:1]:
+            print (message.params["trailing"].split()[-1:][0])
+            if 'r' in message.params["trailing"].split()[-1:][0]:
                 user.identity["register"] = True
             else:
                 user.identity["register"] = False
@@ -27,12 +28,17 @@ class IRC_Channel():
             nick = message.prefix["value"].split("!")[0]
 
             if nick in self.users.keys():
+
                 user = self.users[nick]
 
                 if (message.command["value"] == "PRIVMSG"):
+
+                    print ('PRIVMSG: {:long} :'.format(user))
+
                     user.messages.append(message)
+
                     if (message.params["trailing"] == ".usuarios"):
-                        return 'PRIVMSG {:name} : Hay {} usuarios en la Base de Datos\r\n'.format(self.channel, user.get_count())
+                        return 'PRIVMSG {} : Hay {} usuarios en la Base de Datos\r\n'.format(self.name, user.get_count())
 
                     if (message.params["trailing"] == ".yo"):
                         return 'PRIVMSG {:long} :\r\n'.format(user)
