@@ -36,6 +36,6 @@ class IRC_Message():
 
     def __format__(self, format):
         if (format == 'long'):
-            return '{} => {}: {} => {}: {} => {}'.format(self.timestamp, self.prefix["type"],
+            return '{:10.2f} => {}: {} => {}: {} => {}'.format(self.timestamp, self.prefix["type"],
                     self.prefix["value"], self.command["type"], self.command["value"], self.params)
         return 'IRC_Message'

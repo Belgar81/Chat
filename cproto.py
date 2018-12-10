@@ -74,13 +74,17 @@ class IRC_Client_Protocol(asyncio.BufferedProtocol):
         if (message.command["type"] != "long"): return
 
         if (message.command["value"] == "PRIVMSG"):
-            nick = message.prefix["value"].strip('!')[0]
+
+            nick = message.prefix["value"].split('!')[0]
             if nick in self.users.keys():
 
                 user = self.users[nick]
                 user.messages.append(message)
 
+                print ('PRIVMSG: {:long}'.format(user))
+
                 if (message.params["trailing"] == ".usuarios"):
+
                     self.write('PRIVMSG {:name} : Hay {} usuarios en la BBDD\r\n'.format(self.channel, user.get_count()))
                 """
                     out = 'PRIVMSG {:long} :'.format(self.channel)
@@ -95,6 +99,7 @@ class IRC_Client_Protocol(asyncio.BufferedProtocol):
 
 
         if (message.command["value"] == "JOIN"):
+
             nick = message.prefix["value"].split("!")[0]
             if nick in self.users.keys():
                 user = self.users[nick]
@@ -104,10 +109,12 @@ class IRC_Client_Protocol(asyncio.BufferedProtocol):
                 user = IRC_User(message.prefix["value"])
                 user.inside = True
                 self.users[user.nick] = user
-            print ('{:long}'.format(user))
+            print ('JOIN: {:long}'.format(user))
 
         for cmd in ["PART", "QUIT"]:
             if (message.command["value"] == cmd):
                 nick = message.prefix["value"].split("!")[0]
                 if nick in self.users.keys():
-                    self.users[nick].inside = False
+                    user = self.users[nick]
+                    user.inside = False
+                    print ('{}: {:long}'.format(cmd, user))
