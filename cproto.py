@@ -65,7 +65,7 @@ class IRC_Client_Protocol(asyncio.BufferedProtocol):
         print ('{:long}'.format(message))
 
         if (message.command["value"] == "MODE"):
-            self.write('JOIN {:long} \r\n'.format(self.channel))
+            self.write('JOIN {:name} \r\n'.format(self.channel))
             self.write('MODE SynoBot +c\r\n')
 
 
@@ -77,24 +77,34 @@ class IRC_Client_Protocol(asyncio.BufferedProtocol):
             nick = message.prefix["value"].strip('!')[0]
             if nick in self.users.keys():
 
-                self.users[nick].messages.append(message)
+                user = self.users[nick]
+                user.messages.append(message)
 
-                if (message.params["trailing"] == ".users"):
+                if (message.params["trailing"] == ".usuarios"):
+                    self.write('PRIVMSG {:name} : Hay {} usuarios en la BBDD\r\n'.format(self.channel, user.get_count()))
+                """
                     out = 'PRIVMSG {:long} :'.format(self.channel)
                     for user in self.users.values():
                         out += '{:long}; '.format(user)
                     out += "\r\n"
                     self.write(out)
+                """
+
+                if (message.params["trailing"] == ".mensajes"):
+                    self.write('PRIVMSG {:name} : Has generado {:messages} Mensajes\r\n'.format(self.channel, user))
+
 
         if (message.command["value"] == "JOIN"):
             nick = message.prefix["value"].split("!")[0]
             if nick in self.users.keys():
-                self.users[nick].inside = True
+                user = self.users[nick]
+                user.reload(message.prefix["value"])
+                user.inside = True
             else:
                 user = IRC_User(message.prefix["value"])
                 user.inside = True
                 self.users[user.nick] = user
-                print ('{:long}'.format(user))
+            print ('{:long}'.format(user))
 
         for cmd in ["PART", "QUIT"]:
             if (message.command["value"] == cmd):

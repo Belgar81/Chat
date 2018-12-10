@@ -12,11 +12,21 @@ class IRC_User():
 
         IRC_User.count += 1
 
+    def reload(self, data: str):
+        self.ident, self.ipv = data.split("!")[1].split("@")
+
+    def get_count(self):
+        return (IRC_User.count)
+
     def __format__(self, format):
+        if (format == 'id'):
+            return '{}'.format(self.id)
         if (format == 'nick'):
             return '{}'.format(self.nick)
         if (format == 'mask'):
             return '{}!{}@{}'.format(self.nick, self.ident, self.ipv)
+        if (format == 'messages'):
+            return '{}'.format(len(self.messages))
         if (format == 'long'):
             if self.inside: online = "Conectado"
             else: online = "Desconectado"

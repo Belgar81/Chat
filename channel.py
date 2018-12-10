@@ -5,6 +5,6 @@ class IRC_Channel():
         self.modes = None
 
     def __format__(self, format):
-        if (format == 'long'):
+        if (format == 'name'):
             return '{}'.format(self.name)
         return 'IRC_Channel'
