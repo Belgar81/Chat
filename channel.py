@@ -3,10 +3,16 @@ from user import IRC_User
 
 class IRC_Channel():
 
+    count = 0
+
     def __init__(self, name: str):
+        self.id = IRC_Channel.count
+        IRC_Channel.count += 1
+
         self.name = name
         self.modes = None
         self.users = {}
+        self.messages = []
 
     def dispatcher(self, message: IRC_Message):
 

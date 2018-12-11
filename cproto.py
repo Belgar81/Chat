@@ -1,5 +1,5 @@
 import asyncio
-from message import IRC_Message
+from message import IRC_Messages
 from channel import IRC_Channel
 from user import IRC_User
 
@@ -15,6 +15,8 @@ class IRC_Client_Protocol(asyncio.BufferedProtocol):
 
         self.server = { 'name': None, 'messages':[]}
         self.channel = IRC_Channel(channel)
+
+        self.messages = IRC_Messages()
 
         #actions
 
@@ -53,8 +55,7 @@ class IRC_Client_Protocol(asyncio.BufferedProtocol):
                     if (line[:4] == 'PING'):
                         self.write('PONG{}'.format(line[4:]))
                     else:
-                        message = IRC_Message(line.splitlines()[0], self.server["name"])
-                        self.dispatcher(message)
+                        self.dispatcher(line)
         return None
 
     def eof_received(self) -> None:
@@ -62,14 +63,12 @@ class IRC_Client_Protocol(asyncio.BufferedProtocol):
         self.on_lost.set_result(True)
 
 
-    def dispatcher(self, message: IRC_Message):
+    def dispatcher(self, data: str):
 
-        print ('{:long}'.format(message))
+        action = self.messages.add_message(data)
 
-        if (message.command["value"] == "376"):
-            self.write('JOIN {:name} \r\n'.format(self.channel))
-            self.write('MODE SynoBot +c\r\n')
-
-        action = self.channel.dispatcher(message)
-
-        if action: self.write(action)
+        if action:
+            if (action == "join"):
+                self.write('JOIN {:name} \r\n'.format(self.channel))
+                self.write('MODE SynoBot +c\r\n')
+            else: self.write(action)
