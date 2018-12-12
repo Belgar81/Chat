@@ -11,15 +11,17 @@ class IRC_User():
         self.id = IRC_User.count
         IRC_User.count += 1
 
-        self.identity = {'nick':None, 'ident':None, 'register':False, 'online':True, 'ipv':None, 'olds_ipvs': []}
-        self.alias = []
+        self.nick, data = data.split("!")
+        self.ident, self.ident = data.split("@")
 
-        self.identity["nick"], data = data.split("!")
-        self.identity["ident"], self.identity["ipv"] = data.split("@")
+        self.register = False
+        self.online = True
+        self.ipv = None
+
+        ## Lista de IRC_Users IDs Relacionados
+        self.aliases = []
 
         self.messages = {}
-
-        #print (self.identity)
 
         ## Seguimiento de cambios de nick... registrados no registrados... alias, clones, ...
 
@@ -31,15 +33,15 @@ class IRC_User():
         if (format == 'id'):
             return '{}'.format(self.id)
         if (format == 'nick'):
-            return '{}'.format(self.identity["nick"])
+            return '{}'.format(self.nick)
         if (format == 'mask'):
-            return '{}!{}@{}'.format(self.identity["nick"], self.identity["ident"], self.identity["ipv"])
+            return '{}!{}@{}'.format(self.nick, self.ident, self.ipv)
         if (format == 'messages'):
             return '{}'.format(len(self.messages))
         if (format == 'long'):
-            if self.identity["online"]: online = "Conectado"
+            if self.online: online = "Conectado"
             else: online = "Desconectado"
-            if self.identity["register"]: register = "Registrado"
+            if self.register: register = "Registrado"
             else: register = "No Registrado"
-            return '{} esta {}, {} y ha puesto {} Mensages'.format(self.identity["nick"], online, register, len(self.messages))
+            return '{} esta {}, {}, tiene {} alias y ha puesto {} Mensages'.format(self.nick, online, register, len(self.aliases), len(self.messages))
         return 'IRC_User'
