@@ -7,7 +7,6 @@ class IRC_User():
     count = 0
 
     def __init__(self, data: str):
-        ## data = user mask
         self.id = IRC_User.count
         IRC_User.count += 1
 
@@ -18,13 +17,9 @@ class IRC_User():
         self.online = True
         self.ipv = None
 
-        ## Lista de IRC_Users IDs Relacionados
         self.aliases = []
-
+        self.oldipvs = []
         self.messages = {}
-
-        ## Seguimiento de cambios de nick... registrados no registrados... alias, clones, ...
-
 
     def add_message(self, message: IRC_Message):
         self.messages[message.id] = message
@@ -43,5 +38,5 @@ class IRC_User():
             else: online = "Desconectado"
             if self.register: register = "Registrado"
             else: register = "No Registrado"
-            return '{} esta {}, {}, tiene {} alias y ha puesto {} Mensages'.format(self.nick, online, register, len(self.aliases), len(self.messages))
+            return '{} esta {}, {}, {} ipvs historicas, {} alias y {} Mensages'.format(self.nick, online, register, len(self.oldipvs), len(self.aliases), len(self.messages))
         return 'IRC_User'

@@ -21,7 +21,6 @@ class IRC_Message():
             ## {'middle': ['SynoBot'], 'trailing': 'End of /MOTD command\r\n'}
             return '{}:'.format("bootjoin")
 
-
         if (self.command["value"] == "379"):
             ## {'type': 'server', 'value': 'miranda.chathispano.com'} =>
             ##
@@ -54,30 +53,31 @@ class IRC_Message():
             return '{}:{}'.format("318", nick)
 
         if ((self.prefix["type"] == "user") and (self.command["type"] == "long")):
-            ## {'type': 'long', 'value': 'JOIN'} => {'middle': [], 'trailing': '#barcelona_liberal\r\n'}
-            ## {'type': 'long', 'value': 'PART'} => {'middle': ['#barcelona_liberal\r\n'], 'trailing': None}
-            ## {'type': 'long', 'value': 'QUIT'} => {'middle': [], 'trailing': 'Ping timeout\r\n'}
-            ## {'type': 'long', 'value': 'NICK'} => {'middle': [], 'trailing': 'FeiT0\r\n'}
-            ## {'type': 'long', 'value': 'PRIVMSG'} => {'middle': ['#barcelona_liberal'], 'trailing': 'Anonimaa buenas\r\n'
+
             nick = self.prefix["value"].split("!")[0]
 
             if (self.command["value"] == "JOIN"):
+                ## {'type': 'long', 'value': 'JOIN'} => {'middle': [], 'trailing': '#barcelona_liberal\r\n'}
                 channel = self.params["trailing"].splitlines()[0]
                 return '{}:{}:{}'.format("join", nick, channel)
             elif (self.command["value"] == "PART"):
+                ## {'type': 'long', 'value': 'PART'} => {'middle': ['#barcelona_liberal\r\n'], 'trailing': None}
                 channel = self.params["middle"][0].splitlines()[0]
                 return '{}:{}:{}'.format("part", nick, channel)
             elif (self.command["value"] == "QUIT"):
+                ## {'type': 'long', 'value': 'QUIT'} => {'middle': [], 'trailing': 'Ping timeout\r\n'}
                 return '{}:{}'.format("quit", nick)
             elif (self.command["value"] == "NICK"):
+                ## {'type': 'long', 'value': 'NICK'} => {'middle': [], 'trailing': 'FeiT0\r\n'}
                 newnick = self.params["trailing"].splitlines()[0]
                 return '{}:{}:{}'.format("nick", nick, newnick)
             elif (self.command["value"] == "PRIVMSG"):
+                ## {'type': 'long', 'value': 'PRIVMSG'} => {'middle': ['#barcelona_liberal'], 'trailing': 'Anonimaa buenas\r\n'
                 channel = self.params["middle"][0]
                 message = self.params["trailing"].splitlines()[0]
                 return '{}:{}:{}:{}'.format("privmsg", nick, channel, message)
-            else: return False
 
+            else: return False
 
         return None
 

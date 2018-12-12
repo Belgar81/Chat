@@ -16,10 +16,7 @@ class IRC_Channel():
         self.messages = []
 
     def add_message(self, message: IRC_Message):
-
         pass
-
-
 
     def __format__(self, format):
         if (format == 'name'):

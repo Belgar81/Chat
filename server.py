@@ -77,9 +77,8 @@ class IRC_Server():
                 self.users[nick].add_message(message)
 
         """
-        #print ('{:long}'.format(message))
 
-
+        print ('{:long}'.format(message))
 
         action = message.dispatcher()
 
@@ -105,23 +104,37 @@ class IRC_Server():
 
             return None
 
+
+
         ## '{}:{}:{}:{}'.format("311", nick, ident, ipv)
         elif (cmd == "311"):
             nick, ident, ipv = action.split(':', maxsplit=2)
+
+            ## Create IRC_User
             if (nick not in self.users.keys()):
                 self.users[nick] = IRC_User('{}!{}@{}'.format(nick, ident, ipv))
                 self.users[nick].online = True
+
+            ## Aliases
             for u in self.users.values():
                 if (ipv == u.ipv):
                     self.users[nick].aliases.append(u.id)
                     u.aliases.append(self.users[nick].id)
 
+            ## IPVs Historial para Usuarios Registrados
+            if self.users[nick].register:
+                if (ipv != self.users[nick].ipv):
+                    self.users[nick].oldipvs.append(self.users[nick].ipv)
+                    self.users[nick].ipv = ipv
+
         ## '{}:{}'.format("318", nick)
         elif (cmd == "318"):
             nick = action
             if (nick in self.users.keys()):
+                print ()
                 print ('{:long}'.format(self.users[nick]))
-
+                print ()
+                
         ## '{}:{}:{}'.format("join", nick, channel)
         elif (cmd == "join"):
             nick, channel = action.split(':', maxsplit=1)
@@ -188,7 +201,5 @@ class IRC_Server():
 
         """
             TODO:
-                - Modificar la clave de la entrada a IRC_User con el nick Actual. NO.
-                - Si hay clones QUE? No sirve. Hay que hacer una clase Abstracta Identidad que relacione todos los Clones.
                 - Lista de Canales multiples en mensajes JOIN, PART
         """
