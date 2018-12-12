@@ -1,3 +1,5 @@
+from message import IRC_Message
+
 class IRC_User():
 
     count = 0
@@ -7,7 +9,7 @@ class IRC_User():
         IRC_User.count += 1
 
         self.identity = {'nick':None, 'ident':None, 'register':False, 'online':True, 'ipv':None, 'olds_ipvs': []}
-        self.alias = {'identidad': []}
+        self.alias = []
 
         self.identity["nick"], data = data.split("!")
         self.identity["ident"], self.identity["ipv"] = data.split("@")
@@ -17,6 +19,10 @@ class IRC_User():
         print (self.identity)
 
         ## Seguimiento de cambios de nick... registrados no registrados... alias, clones, ...
+
+
+    def add_message(self, message: IRC_Message):
+        pass
 
     def join(self, data: str):
         self.identity["online"] = True

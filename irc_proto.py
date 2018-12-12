@@ -1,11 +1,11 @@
 import asyncio
-from message import IRC_Messages
-from channel import IRC_Channel
-from user import IRC_User
+from server import IRC_Server
+#from channel import IRC_Channel
+#from user import IRC_User
 
 class IRC_Client_Protocol(asyncio.BufferedProtocol):
 
-    def __init__(self, on_lost, loop, channel):
+    def __init__(self, on_lost, loop):
         self.loop = loop
         self.buffer: bytearray = None
         self.transport = None
@@ -13,10 +13,8 @@ class IRC_Client_Protocol(asyncio.BufferedProtocol):
         self.lastmessage = None
         self.isConnected = False
 
-        self.server = { 'name': None, 'messages':[]}
-        self.channel = IRC_Channel(channel)
 
-        self.messages = IRC_Messages()
+        self.server = IRC_Server()
 
         #actions
 
@@ -41,8 +39,8 @@ class IRC_Client_Protocol(asyncio.BufferedProtocol):
             line = line.decode(errors='replace')
 
             if not self.isConnected:
-                if not self.server["name"]:
-                    self.server["name"] = line.split()[0][1:]
+                self.server.add_server(line.split()[0][1:])
+
                 if (line[:4] == 'PING'):
                     self.isConnected = True
                     self.write('PONG{}'.format(line[4:]))
@@ -65,10 +63,10 @@ class IRC_Client_Protocol(asyncio.BufferedProtocol):
 
     def dispatcher(self, data: str):
 
-        action = self.messages.add_message(data)
+        action = self.server.add_message(data)
 
         if action:
-            if (action == "join"):
-                self.write('JOIN {:name} \r\n'.format(self.channel))
+            if (action == "bootjoin"):
+                self.write('JOIN #barcelona_liberal\r\n')
                 self.write('MODE SynoBot +c\r\n')
             else: self.write(action)
