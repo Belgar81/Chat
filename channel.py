@@ -1,3 +1,5 @@
+# Belgar's Code :)
+
 from message import IRC_Message
 
 class IRC_Channel():

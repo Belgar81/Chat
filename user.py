@@ -1,3 +1,5 @@
+# Belgar's Code :)
+
 from message import IRC_Message
 
 class IRC_User():
@@ -5,6 +7,7 @@ class IRC_User():
     count = 0
 
     def __init__(self, data: str):
+        ## data = user mask
         self.id = IRC_User.count
         IRC_User.count += 1
 
@@ -14,24 +17,15 @@ class IRC_User():
         self.identity["nick"], data = data.split("!")
         self.identity["ident"], self.identity["ipv"] = data.split("@")
 
-        self.messages = []
+        self.messages = {}
 
-        print (self.identity)
+        #print (self.identity)
 
         ## Seguimiento de cambios de nick... registrados no registrados... alias, clones, ...
 
 
     def add_message(self, message: IRC_Message):
-        pass
-
-    def join(self, data: str):
-        self.identity["online"] = True
-
-    def quit(self):
-        self.identity["online"] = False
-
-    def get_count(self):
-        return (IRC_User.count)
+        self.messages[message.id] = message
 
     def __format__(self, format):
         if (format == 'id'):

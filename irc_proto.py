@@ -1,7 +1,7 @@
+# Belgar's Code :)
+
 import asyncio
 from server import IRC_Server
-#from channel import IRC_Channel
-#from user import IRC_User
 
 class IRC_Client_Protocol(asyncio.BufferedProtocol):
 
@@ -64,9 +64,4 @@ class IRC_Client_Protocol(asyncio.BufferedProtocol):
     def dispatcher(self, data: str):
 
         action = self.server.add_message(data)
-
-        if action:
-            if (action == "bootjoin"):
-                self.write('JOIN #barcelona_liberal\r\n')
-                self.write('MODE SynoBot +c\r\n')
-            else: self.write(action)
+        if action: self.write(action)
